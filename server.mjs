@@ -56,6 +56,16 @@ app.use('/api/v1/auth', authRouter);
 
 app.use(errorHandler)
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
     console.log(`Server is running in ${MODE} mode on port ${PORT}`);
+});
+
+/**
+ * @desc This is a global error (rejections) handler
+ * @param {Error} err - The error object
+ * @param {Promise} promise - The promise object
+ */
+process.on('unhandledRejection', (err, promise) => {
+    console.log(`Error: ${err.message}`);
+    server.close(() => process.exit(1));
 });
