@@ -1,6 +1,7 @@
 import User from '../models/user-model.mjs';
 import ErrorResponse from '../models/ErrorResponseModel.mjs';
 import { asyncHandler } from '../middleware/async-handler.mjs';
+import ResponseModel from '../models/ResponseModel.mjs';
 
 /**
  * @desc    Register a new user
@@ -37,6 +38,16 @@ export const login = asyncHandler(async (req, res, next) => {
 
     sendAuthToken(user, 200, res);
 
+});
+
+/**
+ * @desc    Get user profile
+ * @route   GET /api/v1/auth/me
+ * @access  Private
+ */
+export const getUser = asyncHandler(async (req, res, next) => {
+    const user = await User.findById(req.user.id);
+    res.status(200).json(new ResponseModel(200, user));
 });
 
 /**
