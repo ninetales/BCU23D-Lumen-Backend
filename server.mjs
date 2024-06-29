@@ -1,6 +1,7 @@
 import './globals.mjs';
 import express from 'express';
 import dotenv from 'dotenv';
+import { dbConnect } from './config/db-conn.mjs';
 import cors from 'cors';
 import logger from './middleware/logger.mjs';
 import authRouter from './routes/auth-routes.mjs';
@@ -11,6 +12,9 @@ import rateLimit from 'express-rate-limit';
 import hpp from 'hpp';
 
 dotenv.config({ path: './config/.env' });
+
+// Connect to MongoDB
+dbConnect();
 
 const app = express();
 const MODE = process.env.MODE;
