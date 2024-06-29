@@ -10,6 +10,7 @@ import helmet from 'helmet';
 import xss from 'xss-clean';
 import rateLimit from 'express-rate-limit';
 import hpp from 'hpp';
+import { errorHandler } from './middleware/error-handler.mjs';
 
 dotenv.config({ path: './config/.env' });
 
@@ -52,6 +53,8 @@ app.use(hpp());
 
 // Endpoints
 app.use('/api/v1/auth', authRouter);
+
+app.use(errorHandler)
 
 app.listen(PORT, () => {
     console.log(`Server is running in ${MODE} mode on port ${PORT}`);
