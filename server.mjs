@@ -63,7 +63,7 @@ const server = app.listen(PORT, () => {
 /**
  * @desc This is a global error (rejections) handler
  * @param {Error} err - The error object
- * @param {Promise} promise - The promise object.
+ * @param {Promise} promise - The promise object
  */
 process.on('unhandledRejection', (err, promise) => {
     console.log(`Error: ${err.message}`);

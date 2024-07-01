@@ -1,16 +1,24 @@
 import User from '../models/user-model.mjs';
+import Key from '../models/key-model.mjs';
+import { generateKeys } from '../utilities/crypto-lib.mjs';
 import ErrorResponse from '../models/ErrorResponseModel.mjs';
 import { asyncHandler } from '../middleware/async-handler.mjs';
 import ResponseModel from '../models/ResponseModel.mjs';
 
 /**
- * @desc    Register a new user
+ * @desc    Register a new user and generate a key pair
  * @route   POST /api/v1/auth/register
  * @access  Public
  */
 export const register = asyncHandler(async (req, res, next) => {
     const { name, email, password } = req.body;
     const user = await User.create({ name, email, password });
+
+    if (user) {
+        const keys = generateKeys();
+        await Key.create({ user: user._id, privateKey: keys.privateKey, publicKey: keys.publicKey });
+    }
+
     sendAuthToken(user, 201, res);
 });
 
