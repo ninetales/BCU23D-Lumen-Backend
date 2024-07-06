@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import User from '../models/user-model.mjs';
+import User from '../models/user-db-model.mjs';
 import ErrorResponse from '../models/ErrorResponseModel.mjs';
 import { asyncHandler } from '../middleware/async-handler.mjs';
 

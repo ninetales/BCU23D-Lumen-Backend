@@ -1,6 +1,6 @@
-import User from '../models/user-model.mjs';
-import Key from '../models/key-model.mjs';
-import { generateKeys } from '../utilities/crypto-lib.mjs';
+import UserModel from '../models/user-db-model.mjs';
+import WalletModel from '../models/wallet-db-model.mjs';
+import Wallet from '../models/Wallet.mjs';
 import ErrorResponse from '../models/ErrorResponseModel.mjs';
 import { asyncHandler } from '../middleware/async-handler.mjs';
 import ResponseModel from '../models/ResponseModel.mjs';
@@ -12,11 +12,16 @@ import ResponseModel from '../models/ResponseModel.mjs';
  */
 export const register = asyncHandler(async (req, res, next) => {
     const { name, email, password } = req.body;
-    const user = await User.create({ name, email, password });
+    const user = await UserModel.create({ name, email, password });
 
     if (user) {
-        const keys = generateKeys();
-        await Key.create({ user: user._id, privateKey: keys.privateKey, publicKey: keys.publicKey });
+        const wallet = new Wallet();
+        await WalletModel.create({
+            user: user._id,
+            privateKey: wallet.privateKey,
+            publicKey: wallet.publicKey,
+            balance: wallet.balance
+        });
     }
 
     sendAuthToken(user, 201, res);
@@ -34,7 +39,7 @@ export const login = asyncHandler(async (req, res, next) => {
         return next(new ErrorResponse('Please provide an email and password', 400));
     }
 
-    const user = await User.findOne({ email }).select('+password');
+    const user = await UserModel.findOne({ email }).select('+password');
     if (!user) {
         return next(new ErrorResponse('Invalid credentials', 401));
     }

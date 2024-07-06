@@ -3,7 +3,7 @@ import { Schema, model } from 'mongoose';
 // =============================================================
 // Schema for mongoose
 // =============================================================
-const keySchema = new Schema({
+const walletSchema = new Schema({
     user: {
         type: Schema.Types.ObjectId,
         ref: 'User',
@@ -17,6 +17,10 @@ const keySchema = new Schema({
         type: String,
         required: true
     },
+    balance: {
+        type: Schema.Types.Decimal128,
+        required: true
+    },
     createdAt: {
         type: Date,
         default: Date.now
@@ -26,4 +30,4 @@ const keySchema = new Schema({
 // =============================================================
 // Export the model
 // =============================================================
-export default model('Key', keySchema);
+export default model('Wallet', walletSchema);
