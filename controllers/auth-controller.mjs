@@ -1,9 +1,11 @@
 import UserModel from '../models/user-db-model.mjs';
 import WalletModel from '../models/wallet-db-model.mjs';
+import LedgerModel from '../models/ledger-db-model.mjs';
 import Wallet from '../models/Wallet.mjs';
 import ErrorResponse from '../models/ErrorResponseModel.mjs';
 import { asyncHandler } from '../middleware/async-handler.mjs';
 import ResponseModel from '../models/ResponseModel.mjs';
+import Block from '../models/Block.mjs';
 
 /**
  * @desc    Register a new user and generate a key pair
@@ -15,12 +17,20 @@ export const register = asyncHandler(async (req, res, next) => {
     const user = await UserModel.create({ name, email, password });
 
     if (user) {
+        // Create a wallet and add it to the user
         const wallet = new Wallet();
         await WalletModel.create({
             user: user._id,
             privateKey: wallet.privateKey,
             publicKey: wallet.publicKey,
             balance: wallet.balance
+        });
+
+        // Create a ledger and add the genesis block
+        const genesisBlock = Block.genesis();
+        await LedgerModel.create({
+            user: user._id,
+            ledger: [genesisBlock]
         });
     }
 

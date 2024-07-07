@@ -24,7 +24,7 @@ export default class Block {
     };
 
     /**
-     * @desc Mine a block method to generate a new block
+     * @desc Method to mine a new block
      * @returns {Block} a new block
      */
     static mineBlock({ lastBlock, data }) {
