@@ -29,10 +29,11 @@ export default class Block {
      * @returns {Block} a new block
      */
     static mineBlock({ lastBlock, data }) {
+        const lastHash = lastBlock.hash;
+
         let hash, timestamp;
         let nonce = 0;
-        let { difficulty } = lastBlock;
-        const lastHash = lastBlock.hash;
+        let { difficulty, blockIndex } = lastBlock;
 
         do {
             nonce++;
@@ -46,6 +47,7 @@ export default class Block {
 
         return new this({
             timestamp,
+            blockIndex: blockIndex + 1,
             lastHash,
             hash,
             nonce,
@@ -60,7 +62,9 @@ export default class Block {
      */
     static regulateDifficulty({ block, timestamp }) {
         const { difficulty } = block;
+
         if (timestamp - block.timestamp > MINE_RATE) return difficulty - 1;
+
         return difficulty + 1;
     };
 

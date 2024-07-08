@@ -5,6 +5,8 @@ import { dbConnect } from './config/db-conn.mjs';
 import cors from 'cors';
 import logger from './middleware/logger.mjs';
 import authRouter from './routes/auth-routes.mjs';
+import blockRouter from './routes/block-routes.mjs';
+import ledgerRouter from './routes/ledger-routes.mjs';
 import mongoSanitize from 'express-mongo-sanitize';
 import helmet from 'helmet';
 import xss from 'xss-clean';
@@ -53,6 +55,8 @@ app.use(hpp());
 
 // Endpoints
 app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/block', blockRouter);
+app.use('/api/v1/ledger', ledgerRouter);
 
 app.use(errorHandler)
 

@@ -6,6 +6,7 @@ import ErrorResponse from '../models/ErrorResponseModel.mjs';
 import { asyncHandler } from '../middleware/async-handler.mjs';
 import ResponseModel from '../models/ResponseModel.mjs';
 import Block from '../models/Block.mjs';
+import { getWallet } from '../services/wallet-services.mjs';
 
 /**
  * @desc    Register a new user and generate a key pair
@@ -30,7 +31,7 @@ export const register = asyncHandler(async (req, res, next) => {
         const genesisBlock = Block.genesis();
         await LedgerModel.create({
             user: user._id,
-            ledger: [genesisBlock]
+            blocks: [genesisBlock]
         });
     }
 
@@ -69,7 +70,7 @@ export const login = asyncHandler(async (req, res, next) => {
  * @access  Private
  */
 export const getUser = asyncHandler(async (req, res, next) => {
-    const user = await User.findById(req.user.id);
+    const user = await UserModel.findById(req.user.id).select('-createdAt -__v');
     res.status(200).json(new ResponseModel(200, user));
 });
 
@@ -83,3 +84,11 @@ const sendAuthToken = (user, statusCode, res) => {
     const token = user.generateAuthToken();
     res.status(200).json({ sucess: true, statusCode, token });
 };
+
+/**
+ * @desc Get the wallet of the authenticated user
+ */
+export const wallet = asyncHandler(async (req, res, next) => {
+    const wallet = await getWallet(req.user.id);
+    wallet && res.status(200).json(new ResponseModel(200, wallet));
+});

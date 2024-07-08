@@ -1,4 +1,5 @@
 import { Schema, model } from 'mongoose';
+import BlockSchema from './block-db-model.mjs';
 
 const ledgerSchema = new Schema({
     user: {
@@ -6,34 +7,9 @@ const ledgerSchema = new Schema({
         ref: 'User',
         required: true
     },
-    ledger: [{
-        timestamp: {
-            type: Number,
-            required: true
-        },
-        blockIndex: {
-            type: Number,
-            required: true
-        },
-        lastHash: {
-            type: String,
-            required: true
-        },
-        hash: {
-            type: String,
-            required: true
-        },
-        nonce: {
-            type: Number,
-            required: true
-        },
-        difficulty: {
-            type: Number,
-            required: true
-        },
-        data: [{
-            type: Array,
-        }]
+    blocks: [{
+        type: BlockSchema,
+        required: true
     }],
     createdAt: {
         type: Date,
