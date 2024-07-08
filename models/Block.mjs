@@ -7,8 +7,9 @@ import { generateHash } from "../utilities/crypto-lib.mjs";
  */
 export default class Block {
 
-    constructor({ timestamp, lastHash, hash, nonce, difficulty, data }) {
+    constructor({ timestamp, blockIndex, lastHash, hash, nonce, difficulty, data }) {
         this.timestamp = timestamp;
+        this.blockIndex = blockIndex;
         this.lastHash = lastHash;
         this.hash = hash;
         this.nonce = nonce;

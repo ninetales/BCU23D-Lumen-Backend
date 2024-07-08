@@ -7,6 +7,7 @@ import { generateHash } from "../utilities/crypto-lib.mjs";
 describe('Block', () => {
 
     const timestamp = Date.now();
+    const blockIndex = 1;
     const lastHash = '0';
     const hash = '0';
     const nonce = 1;
@@ -15,6 +16,7 @@ describe('Block', () => {
 
     const block = new Block({
         timestamp,
+        blockIndex,
         lastHash,
         hash,
         nonce,
@@ -24,8 +26,9 @@ describe('Block', () => {
 
 
     describe('Properties', () => {
-        it('should have the following properties: timestamp, hash, previousHash, data, nonce, difficulty', () => {
+        it('should have the following properties: timestamp, blockIndex, hash, previousHash, data, nonce, difficulty', () => {
             expect(block).toHaveProperty('timestamp');
+            expect(block).toHaveProperty('blockIndex');
             expect(block).toHaveProperty('hash');
             expect(block).toHaveProperty('lastHash');
             expect(block).toHaveProperty('nonce');
@@ -35,6 +38,7 @@ describe('Block', () => {
 
         it('should have a value for each property', () => {
             expect(block.timestamp).toEqual(timestamp);
+            expect(block.blockIndex).toEqual(blockIndex);
             expect(block.hash).toEqual(hash);
             expect(block.lastHash).toEqual(lastHash);
             expect(block.nonce).toEqual(nonce);

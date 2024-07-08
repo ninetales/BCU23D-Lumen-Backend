@@ -11,6 +11,10 @@ const ledgerSchema = new Schema({
             type: Number,
             required: true
         },
+        blockIndex: {
+            type: Number,
+            required: true
+        },
         lastHash: {
             type: String,
             required: true
