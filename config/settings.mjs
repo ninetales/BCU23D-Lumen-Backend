@@ -9,5 +9,5 @@ export const GENESIS_DATA = {
     hash: '0',
     nonce: 0,
     difficulty: INITIAL_DIFFICULTY,
-    data: []
+    transactions: []
 }

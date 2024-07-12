@@ -6,6 +6,8 @@
   "scripts": {
     "build": "node server.mjs",
     "dev": "nodemon server.mjs",
+    "node-2": "PORT=3002 SOCKET_PORT=5002 MEMBER_NODES=ws://localhost:5001 npm run dev",
+    "node-3": "PORT=3003 SOCKET_PORT=5003 MEMBER_NODES=ws://localhost:5001,ws://localhost:5002 npm run dev",
     "test": "vitest",
     "test:ui": "vitest --ui"
   },
@@ -26,6 +28,7 @@
     "mongodb": "^6.8.0",
     "mongoose": "^8.4.4",
     "uuid": "^10.0.0",
+    "ws": "^8.18.0",
     "xss-clean": "^0.1.4"
   },
   "devDependencies": {

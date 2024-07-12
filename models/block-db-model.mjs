@@ -1,4 +1,5 @@
 import { Schema, model } from "mongoose";
+import TransactionSchema from "./transaction-db-model.mjs";
 
 const BlockSchema = new Schema({
     _id: false,
@@ -26,8 +27,9 @@ const BlockSchema = new Schema({
         type: Number,
         required: true
     },
-    data: [{
-        type: Array,
+    transactions: [{
+        type: TransactionSchema,
+        required: true
     }]
 });
 

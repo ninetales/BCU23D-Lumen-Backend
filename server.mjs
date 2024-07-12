@@ -13,15 +13,18 @@ import xss from 'xss-clean';
 import rateLimit from 'express-rate-limit';
 import hpp from 'hpp';
 import { errorHandler } from './middleware/error-handler.mjs';
+import WSServer from './ws-server.mjs';
 
 dotenv.config({ path: './config/.env' });
+
+export const wsServer = new WSServer();
 
 // Connect to MongoDB
 dbConnect();
 
 const app = express();
 const MODE = process.env.MODE;
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 4001;
 
 if (process.env.MODE === 'development') {
     app.use(logger);

@@ -7,14 +7,14 @@ import { generateHash } from "../utilities/crypto-lib.mjs";
  */
 export default class Block {
 
-    constructor({ timestamp, blockIndex, lastHash, hash, nonce, difficulty, data }) {
+    constructor({ timestamp, blockIndex, lastHash, hash, nonce, difficulty, transactions }) {
         this.timestamp = timestamp;
         this.blockIndex = blockIndex;
         this.lastHash = lastHash;
         this.hash = hash;
         this.nonce = nonce;
         this.difficulty = difficulty;
-        this.data = data;
+        this.transactions = transactions;
     }
 
     /**
@@ -28,7 +28,7 @@ export default class Block {
      * @desc Method to mine a new block
      * @returns {Block} a new block
      */
-    static mineBlock({ lastBlock, data }) {
+    static mineBlock({ lastBlock, transactions }) {
         const lastHash = lastBlock.hash;
 
         let hash, timestamp;
@@ -42,7 +42,7 @@ export default class Block {
                 block: lastBlock,
                 timestamp
             });
-            hash = generateHash(timestamp, lastHash, data, nonce, difficulty);
+            hash = generateHash(timestamp, lastHash, transactions, nonce, difficulty);
         } while (hexToBinary(hash).substring(0, difficulty) !== '0'.repeat(difficulty));
 
         return new this({
@@ -52,7 +52,7 @@ export default class Block {
             hash,
             nonce,
             difficulty,
-            data
+            transactions
         });
     };
 

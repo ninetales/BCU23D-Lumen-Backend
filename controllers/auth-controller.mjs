@@ -7,6 +7,7 @@ import { asyncHandler } from '../middleware/async-handler.mjs';
 import ResponseModel from '../models/ResponseModel.mjs';
 import Block from '../models/Block.mjs';
 import { getWallet } from '../services/wallet-services.mjs';
+import { wsServer } from '../server.mjs';
 
 /**
  * @desc    Register a new user and generate a key pair
@@ -36,6 +37,7 @@ export const register = asyncHandler(async (req, res, next) => {
     }
 
     sendAuthToken(user, 201, res);
+
 });
 
 /**
@@ -61,6 +63,12 @@ export const login = asyncHandler(async (req, res, next) => {
     }
 
     sendAuthToken(user, 200, res);
+
+    // Set the userId for the user
+    wsServer.setUserId(user._id.toHexString());
+
+    // Start listening to nodes
+    wsServer.listen();
 
 });
 

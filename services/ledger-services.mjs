@@ -4,10 +4,14 @@ import LedgerModel from '../models/ledger-db-model.mjs';
  * @desc Get the ledger of the authenticated user
  * @module services/ledger-services
  */
-export const getLedger = async (userId) => {
+export const getLedgerFromDb = async (userId) => {
     return await LedgerModel.findOne({ user: userId }).select('-_id -user -createdAt -__v');
 };
 
-export const updateLedger = async ({ userId, ledger }) => {
-    // ToDo: Implement updateLedger
+export const updateLedgerInDb = async ({ userId, ledger }) => {
+    console.log('Updating ledger in the database');
+    return await LedgerModel.updateOne(
+        { user: userId },
+        { $set: { blocks: ledger.blocks } }
+    );
 }
