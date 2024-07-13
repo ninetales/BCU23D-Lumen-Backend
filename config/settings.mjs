@@ -1,5 +1,5 @@
 export const INITIAL_BALANCE = 500;
-export const MINE_RATE = 50000;
+export const MINE_RATE = 500000;
 const INITIAL_DIFFICULTY = 4;
 
 export const GENESIS_DATA = {

@@ -7,6 +7,7 @@ import logger from './middleware/logger.mjs';
 import authRouter from './routes/auth-routes.mjs';
 import blockRouter from './routes/block-routes.mjs';
 import ledgerRouter from './routes/ledger-routes.mjs';
+import transactionRouter from './routes/transaction-routes.mjs';
 import mongoSanitize from 'express-mongo-sanitize';
 import helmet from 'helmet';
 import xss from 'xss-clean';
@@ -14,9 +15,13 @@ import rateLimit from 'express-rate-limit';
 import hpp from 'hpp';
 import { errorHandler } from './middleware/error-handler.mjs';
 import WSServer from './ws-server.mjs';
+import Wallet from './models/Wallet.mjs';
+import MemPool from './models/MemPool.mjs';
 
 dotenv.config({ path: './config/.env' });
 
+export const wallet = new Wallet();
+export const memPool = new MemPool();
 export const wsServer = new WSServer();
 
 // Connect to MongoDB
@@ -60,6 +65,7 @@ app.use(hpp());
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/block', blockRouter);
 app.use('/api/v1/ledger', ledgerRouter);
+app.use('/api/v1/wallet', transactionRouter);
 
 app.use(errorHandler)
 

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import Wallet from '../models/Wallet.mjs';
-import { generateKeys } from '../utilities/crypto-lib.mjs';
+import { verifySignature } from '../utilities/crypto-lib.mjs';
 
 describe('Wallet', () => {
 
@@ -10,16 +10,44 @@ describe('Wallet', () => {
         expect(wallet).toBeInstanceOf(Wallet);
     });
 
-    it('should have a privateKey property', () => {
-        expect(wallet).toHaveProperty('privateKey');
+    describe('Properties', () => {
+
+        it('should have a privateKey property', () => {
+            expect(wallet).toHaveProperty('privateKey');
+        });
+
+        it('should have a property publicKey', () => {
+            expect(wallet).toHaveProperty('publicKey');
+        });
+
+        it('should have a balance property', () => {
+            expect(wallet).toHaveProperty('balance');
+        });
+
     });
 
-    it('should have a property publicKey', () => {
-        expect(wallet).toHaveProperty('publicKey');
-    });
+    describe('Signature process', () => {
+        let transaction = 'Hello World';
 
-    it('should have a balance property', () => {
-        expect(wallet).toHaveProperty('balance');
+        it('should verify a signature', () => {
+            expect(
+                verifySignature({
+                    publicKey: wallet.publicKey,
+                    transaction,
+                    signature: wallet.sign(transaction),
+                })
+            ).toBe(true);
+        });
+
+        it('should not verify an invalid signature', () => {
+            const isVerified = verifySignature({
+                publicKey: wallet.publicKey,
+                transaction,
+                signature: new Wallet().sign(transaction)
+            })
+            expect(isVerified).toBe(false);
+        });
+
     });
 
 });

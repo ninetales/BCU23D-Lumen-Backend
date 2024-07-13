@@ -1,13 +1,13 @@
 import UserModel from '../models/user-db-model.mjs';
 import WalletModel from '../models/wallet-db-model.mjs';
 import LedgerModel from '../models/ledger-db-model.mjs';
-import Wallet from '../models/Wallet.mjs';
 import ErrorResponse from '../models/ErrorResponseModel.mjs';
 import { asyncHandler } from '../middleware/async-handler.mjs';
 import ResponseModel from '../models/ResponseModel.mjs';
 import Block from '../models/Block.mjs';
 import { getWallet } from '../services/wallet-services.mjs';
 import { wsServer } from '../server.mjs';
+import { wallet } from '../server.mjs';
 
 /**
  * @desc    Register a new user and generate a key pair
@@ -19,8 +19,8 @@ export const register = asyncHandler(async (req, res, next) => {
     const user = await UserModel.create({ name, email, password });
 
     if (user) {
+
         // Create a wallet and add it to the user
-        const wallet = new Wallet();
         await WalletModel.create({
             user: user._id,
             privateKey: wallet.privateKey,
@@ -62,7 +62,12 @@ export const login = asyncHandler(async (req, res, next) => {
         return next(new ErrorResponse('Invalid credentials', 401));
     }
 
+    // Send token 
     sendAuthToken(user, 200, res);
+
+    const dbWallet = await getWallet(user._id.toHexString());
+
+    wallet.updateMemCredentials({ wallet: dbWallet });
 
     // Set the userId for the user
     wsServer.setUserId(user._id.toHexString());
@@ -92,11 +97,3 @@ const sendAuthToken = (user, statusCode, res) => {
     const token = user.generateAuthToken();
     res.status(200).json({ sucess: true, statusCode, token });
 };
-
-/**
- * @desc Get the wallet of the authenticated user
- */
-export const wallet = asyncHandler(async (req, res, next) => {
-    const wallet = await getWallet(req.user.id);
-    wallet && res.status(200).json(new ResponseModel(200, wallet));
-});

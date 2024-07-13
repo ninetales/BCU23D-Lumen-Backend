@@ -22,14 +22,15 @@ export const generateHash = (...args) => {
 
 export const ellipticHash = new ec('secp256k1');
 
-export const verifySignature = ({ publicKey, data, signature }) => {
+export const verifySignature = ({ publicKey, transaction, signature }) => {
     const key = ellipticHash.keyFromPublic(publicKey, 'hex');
-    return key.verify(generateHash(data), signature);
+    return key.verify(generateHash(transaction), signature);
 };
 
 /**
  * @desc Generate an object containing a key pair, public key, and private key
- * @returns {Object} An object containing the key pair, public key, and private key
+ * @returns {Object} An object containing the key pair, public key, private key and signTransaction method
+ * @method signTransaction - Method to sign a transaction
  */
 // TODO: Perhaps encrypt the keys before returning them
 export const generateKeys = () => {
@@ -38,5 +39,8 @@ export const generateKeys = () => {
         keyPair,
         publicKey: keyPair.getPublic('hex'),
         privateKey: keyPair.getPrivate('hex'),
+        signTransaction: function (transaction) {
+            return keyPair.sign(generateHash(transaction));
+        }
     }
 }

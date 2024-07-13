@@ -54,16 +54,14 @@ export default class WSServer {
         this.messageHandler(node);
 
         const ledger = await Ledger.get({ userId: this.userId });
-        console.log('Sending ledger', ledger);
 
         node.send(JSON.stringify(ledger));
     }
 
     messageHandler(node) {
         node.on('message', (message) => {
-            console.log('--- Message received ---');
             const recievedLedger = JSON.parse(message);
-            console.log(recievedLedger);
+
             Ledger.replace({
                 userId: this.userId,
                 newLedger: recievedLedger
@@ -72,7 +70,6 @@ export default class WSServer {
     }
 
     async broadcast({ ledger }) {
-        console.log('Broadcasting ledger', ledger)
         this.nodes.forEach((node) => node.send(JSON.stringify(ledger)));
     }
 }

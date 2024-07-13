@@ -12,7 +12,7 @@ describe('Block', () => {
     const hash = '0';
     const nonce = 1;
     const difficulty = 4;
-    const data = { amount: 7, sender: 'Bruce Wayne', recipient: 'Tony Stark' };
+    const transactions = { amount: 7, sender: 'Bruce Wayne', recipient: 'Tony Stark' };
 
     const block = new Block({
         timestamp,
@@ -21,19 +21,19 @@ describe('Block', () => {
         hash,
         nonce,
         difficulty,
-        data
+        transactions
     });
 
 
     describe('Properties', () => {
-        it('should have the following properties: timestamp, blockIndex, hash, previousHash, data, nonce, difficulty', () => {
+        it('should have the following properties: timestamp, blockIndex, hash, previousHash, transactions, nonce, difficulty', () => {
             expect(block).toHaveProperty('timestamp');
             expect(block).toHaveProperty('blockIndex');
             expect(block).toHaveProperty('hash');
             expect(block).toHaveProperty('lastHash');
             expect(block).toHaveProperty('nonce');
             expect(block).toHaveProperty('difficulty');
-            expect(block).toHaveProperty('data');
+            expect(block).toHaveProperty('transactions');
         });
 
         it('should have a value for each property', () => {
@@ -43,7 +43,7 @@ describe('Block', () => {
             expect(block.lastHash).toEqual(lastHash);
             expect(block.nonce).toEqual(nonce);
             expect(block.difficulty).toEqual(difficulty);
-            expect(block.data).toEqual(data);
+            expect(block.transactions).toEqual(transactions);
         });
     });
 
@@ -61,12 +61,12 @@ describe('Block', () => {
     });
 
     describe('mineBlock()', () => {
-        let lastBlock, minedBlock, data;
+        let lastBlock, minedBlock, transactions;
 
         beforeEach(() => {
             lastBlock = Block.genesis();
-            data = { amount: 7, sender: 'Bruce Wayne', recipient: 'Tony Stark' };
-            minedBlock = Block.mineBlock({ lastBlock, data });
+            transactions = { amount: 7, sender: 'Bruce Wayne', recipient: 'Tony Stark' };
+            minedBlock = Block.mineBlock({ lastBlock, transactions });
         });
 
         it('should return an instance of the Block class', () => {
@@ -81,8 +81,8 @@ describe('Block', () => {
             expect(minedBlock.lastHash).toEqual(lastBlock.hash);
         });
 
-        it('should set the data', () => {
-            expect(minedBlock.data).toEqual(data);
+        it('should set the transactions', () => {
+            expect(minedBlock.transactions).toEqual(transactions);
         });
 
         it('should produce a hash the meets the difficulty level', () => {
@@ -98,7 +98,7 @@ describe('Block', () => {
                     minedBlock.lastHash,
                     minedBlock.nonce,
                     minedBlock.difficulty,
-                    data
+                    transactions
                 )
             );
         });

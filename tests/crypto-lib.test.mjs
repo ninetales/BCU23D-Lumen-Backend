@@ -23,19 +23,19 @@ describe('Hashing', () => {
 
 describe('Keys', () => {
 
-    const data = { name: 'Ash', pokemon: 'Pikachu' };
-    const { keyPair, publicKey } = generateKeys();
+    const transaction = { name: 'Ash', pokemon: 'Pikachu' };
+    const { publicKey, signTransaction } = generateKeys();
 
     it('should verify a signature with correct private key', () => {
-        const signature = keyPair.sign(generateHash(data));
-        const isVerified = verifySignature({ publicKey, data, signature });
+        const signature = signTransaction(transaction);
+        const isVerified = verifySignature({ publicKey, transaction, signature });
         expect(isVerified).toBeTruthy();
     });
 
     it('should fail to verify with incorrect private key', () => {
-        const { keyPair } = generateKeys(); // Generate new keys
-        const signature = keyPair.sign(generateHash(data));
-        const isVerified = verifySignature({ publicKey, data, signature }); // Use old public key
+        const { signTransaction } = generateKeys(); // Generate new keys and methods
+        const signature = signTransaction(transaction);
+        const isVerified = verifySignature({ publicKey, transaction, signature }); // Use old public key
 
         expect(isVerified).toBeFalsy();
     });
