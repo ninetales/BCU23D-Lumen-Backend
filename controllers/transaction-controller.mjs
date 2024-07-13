@@ -1,6 +1,6 @@
 import { asyncHandler } from "../middleware/async-handler.mjs";
 import ResponseModel from "../models/ResponseModel.mjs";
-import { wallet } from "../server.mjs";
+import { wallet, wsServer } from "../server.mjs";
 import { memPool } from "../server.mjs";
 
 export const addTransaction = asyncHandler(async (req, res, next) => {
@@ -17,6 +17,7 @@ export const addTransaction = asyncHandler(async (req, res, next) => {
     memPool.addTransaction({ transaction });
 
     // todo: broadcast to all nodes
+    wsServer.broadcastTransaction({ transaction });
 
     res.status(200).json(new ResponseModel(200, transaction));
 });

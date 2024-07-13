@@ -8,6 +8,7 @@ import Block from '../models/Block.mjs';
 import { getWallet } from '../services/wallet-services.mjs';
 import { wsServer } from '../server.mjs';
 import { wallet } from '../server.mjs';
+import { memPool } from '../server.mjs';
 
 /**
  * @desc    Register a new user and generate a key pair
@@ -71,6 +72,9 @@ export const login = asyncHandler(async (req, res, next) => {
 
     // Set the userId for the user
     wsServer.setUserId(user._id.toHexString());
+
+    // Set the memPool for the user
+    wsServer.setMemPool(memPool);
 
     // Start listening to nodes
     wsServer.listen();

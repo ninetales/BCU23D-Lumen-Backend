@@ -6,14 +6,19 @@ const NODES = process.env.MEMBER_NODES ? process.env.MEMBER_NODES.split(',') : [
 
 export default class WSServer {
 
-    constructor({ userId, ledger } = {}) {
+    constructor({ userId, ledger, memPool } = {}) {
         this.ledger = ledger;
+        this.memPool = memPool;
         this.userId = userId;
         this.nodes = [];
     };
 
     setUserId(userId) {
         this.userId = userId;
+    }
+
+    setMemPool(memPool) {
+        this.memPool = memPool;
     }
 
     setLedger(ledger) {
@@ -60,16 +65,31 @@ export default class WSServer {
 
     messageHandler(node) {
         node.on('message', (message) => {
-            const recievedLedger = JSON.parse(message);
+            console.log('Message received:', JSON.parse(message));
 
-            Ledger.replace({
-                userId: this.userId,
-                newLedger: recievedLedger
-            });
+            const response = JSON.parse(message);
+
+            switch (response.type) {
+                case 'ledger':
+                    Ledger.replace({
+                        userId: this.userId,
+                        newLedger: response.data
+                    });
+                    break;
+                case 'transaction':
+                    this.memPool.addTransaction({ transaction: response.data });
+                    break;
+            }
+
+
         });
     }
 
     async broadcast({ ledger }) {
-        this.nodes.forEach((node) => node.send(JSON.stringify(ledger)));
+        this.nodes.forEach((node) => node.send(JSON.stringify({ type: 'ledger', data: ledger })));
+    }
+
+    async broadcastTransaction({ transaction }) {
+        this.nodes.forEach((node) => node.send(JSON.stringify({ type: 'transaction', data: transaction })));
     }
 }
