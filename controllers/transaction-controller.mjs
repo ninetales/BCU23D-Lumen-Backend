@@ -9,9 +9,9 @@ export const addTransaction = asyncHandler(async (req, res, next) => {
     let transaction = memPool.transactionExists({ address: wallet.publicKey });
 
     if (transaction) {
-        transaction.update({ sender: wallet, recipient, amount });
+        transaction.update({ sender: wallet, recipient, amount: parseFloat(amount) });
     } else {
-        transaction = wallet.createTransaction({ recipient, amount });
+        transaction = wallet.createTransaction({ recipient, amount: parseFloat(amount) });
     }
 
     memPool.addTransaction({ transaction });
