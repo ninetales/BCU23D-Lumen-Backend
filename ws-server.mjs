@@ -1,29 +1,31 @@
 import { WebSocketServer, WebSocket } from "ws";
 import Ledger from "./models/Ledger.mjs";
+import { ledger } from "./server.mjs";
+import { memPool } from "./server.mjs";
 
 const SOCKET_PORT = process.env.SOCKET_PORT || 5001;
 const NODES = process.env.MEMBER_NODES ? process.env.MEMBER_NODES.split(',') : [];
 
 export default class WSServer {
 
-    constructor({ userId, ledger, memPool } = {}) {
-        this.ledger = ledger;
-        this.memPool = memPool;
-        this.userId = userId;
+    constructor(/*{ userId, ledger, memPool } = {}*/) {
+        // this.ledger = ledger;
+        // this.memPool = memPool;
+        // this.userId = userId;
         this.nodes = [];
     };
 
-    setUserId(userId) {
-        this.userId = userId;
-    }
+    // setUserId(userId) {
+    //     this.userId = userId;
+    // }
 
-    setMemPool(memPool) {
-        this.memPool = memPool;
-    }
+    // setMemPool(memPool) {
+    //     this.memPool = memPool;
+    // }
 
-    setLedger(ledger) {
-        this.ledger = ledger;
-    }
+    // setLedger(ledger) {
+    //     this.ledger = ledger;
+    // }
 
     listen() {
         console.log('THE USER ID', this.userId);
@@ -58,35 +60,39 @@ export default class WSServer {
 
         this.messageHandler(node);
 
-        const ledger = await Ledger.get({ userId: this.userId });
+        // const ledger = await Ledger.get({ userId: this.userId });
 
-        node.send(JSON.stringify(ledger));
+        // node.send(JSON.stringify(ledger));
+        console.log('Sending ledger to node...', ledger);
+        node.send(JSON.stringify({ type: 'ledger', data: ledger.blocks }))
     }
 
     messageHandler(node) {
         node.on('message', (message) => {
-            console.log('Message received:', JSON.parse(message));
+            console.log('Response received:', JSON.parse(message));
 
             const response = JSON.parse(message);
 
             switch (response.type) {
                 case 'ledger':
-                    Ledger.replace({
-                        userId: this.userId,
+                    ledger.replace({
                         newLedger: response.data
                     });
                     break;
                 case 'transaction':
-                    this.memPool.addTransaction({ transaction: response.data });
+                    memPool.addTransaction({ transaction: response.data });
                     break;
+                default:
+                    return;
             }
 
 
         });
     }
 
-    async broadcast({ ledger }) {
-        this.nodes.forEach((node) => node.send(JSON.stringify({ type: 'ledger', data: ledger })));
+    async broadcast() {
+        console.log('Broadcasting ledger to all nodes...');
+        this.nodes.forEach((node) => node.send(JSON.stringify({ type: 'ledger', data: ledger.blocks })));
     }
 
     async broadcastTransaction({ transaction }) {

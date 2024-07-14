@@ -5,6 +5,9 @@ import { getLastBlock } from "../services/block-services.mjs";
 import Miner from "../models/Miner.mjs";
 import Ledger from "../models/Ledger.mjs";
 import { getWallet } from "../services/wallet-services.mjs";
+import { ledger } from "../server.mjs";
+import { wallet } from "../server.mjs";
+import { memPool } from "../server.mjs";
 
 /**
  * @desc Get the last block in the blockchain
@@ -19,17 +22,12 @@ export const lastBlock = asyncHandler(async (req, res, next) => {
  */
 export const mineBlock = asyncHandler(async (req, res, next) => {
 
-    const ledger = await Ledger.get({ userId: req.user.id });
-    const wallet = await getWallet(req.user.id);
-    const mempool = []; //todo: get mempool
-    const networkNodes = []; // todo: get network nodes
+    // const ledger = await Ledger.get({ userId: req.user.id });
+    // const wallet = await getWallet(req.user.id);
+    // const mempool = []; //todo: get mempool
+    // const networkNodes = []; // todo: get network nodes
 
-    const miner = new Miner({
-        ledger,
-        wallet,
-        mempool,
-        networkNodes
-    });
+    const miner = new Miner();
 
     miner.mineBlock();
 

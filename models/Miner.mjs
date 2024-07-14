@@ -1,14 +1,15 @@
 import Ledger from "./Ledger.mjs";
 import { wsServer } from "../server.mjs";
+import { ledger } from "../server.mjs";
 
 export default class Miner {
 
-    constructor({ ledger, wallet, mempool, networkNodes }) {
-        this.ledger = ledger;
-        this.wallet = wallet;
-        this.mempool = mempool;
-        this.networkNodes = networkNodes;
-    }
+    // constructor({ ledger, wallet, mempool }) {
+    //     this.ledger = ledger;
+    //     this.wallet = wallet;
+    //     this.mempool = mempool;
+    //     // this.networkNodes = networkNodes;
+    // }
 
     async mineBlock() {
 
@@ -20,17 +21,16 @@ export default class Miner {
         // todo: create a reward transaction
 
         // todo: create a block with the valid transactions and place it in the ledger
-        const newBlock = await Ledger.addBlock({
-            userId: this.wallet.user,
-            ledger: this.ledger,
+        ledger.addBlock({
             transactions: validTransactions
         });
 
-        this.ledger.blocks.push(newBlock);
-        console.log('The new ledger', this.ledger);
+        // this.ledger.blocks.push(newBlock);
+        // ledger.addBlock(newBlock);
+        console.log('The new ledger', ledger);
 
         // broadcast the new ledger to all nodes in the network
-        wsServer.broadcast({ ledger: this.ledger });
+        wsServer.broadcast();
 
         // clear the transaction pool
     }

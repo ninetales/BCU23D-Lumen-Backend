@@ -5,10 +5,25 @@ import { generateHash } from "../utilities/crypto-lib.mjs";
 
 export default class Ledger {
 
-    static async addBlock({ userId, ledger, transactions }) {
-        const lastBlock = ledger.blocks.at(-1);
+    constructor({ userId } = {}) {
+        this.userId = userId;
+        this.blocks = [Block.genesis()];
+    }
+
+    setUserId({ userId }) {
+        this.userId = userId;
+    }
+
+    updateMemLedger({ ledger }) {
+        this.blocks = ledger.blocks;
+        // todo: update the database
+    }
+
+    async addBlock({ transactions }) {
+        const lastBlock = this.blocks.at(-1);
         const newBlock = Block.mineBlock({ lastBlock, transactions });
-        await addBlockToDb({ userId, newBlock });
+        this.blocks.push(newBlock);
+        await addBlockToDb({ userId: this.userId, newBlock });
         return newBlock;
     }
 
@@ -16,41 +31,45 @@ export default class Ledger {
      * Replace the current ledger with a new ledger
      * @param {*} newLedger 
      */
-    static async replace({ userId, newLedger }) {
-        const ledger = await Ledger.get({ userId });
+    async replace({ newLedger }) {
+        // const ledger = await Ledger.get({ userId });
 
-        if (ledger.blocks.length >= newLedger.blocks.length) return;
+        if (this.blocks.length >= newLedger.length) return;
         console.log('The stage 1 - completed');
 
-        if (!Ledger.validateLedger(newLedger)) return;
+        if (!this.validateLedger(newLedger)) return;
         console.log('The stage 2 - completed');
 
-        const updatedLedger = updateLedgerInDb({ userId, ledger: newLedger });
+        this.blocks = newLedger;
+        console.log('The mem ledger should be updated', this.blocks);
+
+        const updatedLedger = await updateLedgerInDb({ userId: this.userId, blocks: this.blocks });
 
         console.log('The new updated ledger', updatedLedger);
     }
 
-    /**
-     * @desc Get the ledger of the authenticated user
-     * @returns 
-     */
-    static async get({ userId }) {
-        return await getLedgerFromDb(userId);
-    }
+    // /**
+    //  * @desc Get the ledger of the authenticated user
+    //  * @returns 
+    //  */
+    // // just get the local ledger
+    // static get({ userId }) {
+    //     return await getLedgerFromDb(userId);
+    // }
 
     /**
      * @desc Validate the ledger
      * @param {*} ledger 
      */
-    static validateLedger(ledger) {
-        if (JSON.stringify(ledger.blocks.at(0)) !== JSON.stringify(Block.genesis())) return false;
+    validateLedger(blocks) {
+        if (JSON.stringify(blocks.at(0)) !== JSON.stringify(Block.genesis())) return false;
         console.log('Past validation stage 1');
 
-        for (let i = 1; i < ledger.blocks.length; i++) {
-            console.log(`Iteration ${i} out of ${ledger.blocks.length}`);
-            const { timestamp, lastHash, hash, nonce, difficulty, transactions } = ledger.blocks.at(i);
-            const currentLastHash = ledger.blocks[i - 1].hash;
-            const lastDifficulty = ledger.blocks[i - 1].difficulty;
+        for (let i = 1; i < blocks.length; i++) {
+            console.log(`Iteration ${i} out of ${blocks.length}`);
+            const { timestamp, lastHash, hash, nonce, difficulty, transactions } = blocks.at(i);
+            const currentLastHash = blocks[i - 1].hash;
+            const lastDifficulty = blocks[i - 1].difficulty;
 
             if (lastHash !== currentLastHash) return false;
             console.log('The hash is OK');

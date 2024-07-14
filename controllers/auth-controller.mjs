@@ -9,6 +9,9 @@ import { getWallet } from '../services/wallet-services.mjs';
 import { wsServer } from '../server.mjs';
 import { wallet } from '../server.mjs';
 import { memPool } from '../server.mjs';
+import { ledger } from '../server.mjs';
+import Ledger from '../models/Ledger.mjs';
+import { getLedgerFromDb } from '../services/ledger-services.mjs';
 
 /**
  * @desc    Register a new user and generate a key pair
@@ -66,18 +69,30 @@ export const login = asyncHandler(async (req, res, next) => {
     // Send token 
     sendAuthToken(user, 200, res);
 
-    const dbWallet = await getWallet(user._id.toHexString());
+    const userId = user._id.toHexString();
+
+    // Set the userId for the user in the ledger
+    ledger.setUserId({ userId });
+
+    // todo: get the ledger and update mem ledger
+    // ledger.updateMemLedger({ ledger: await Ledger.get({ userId: user._id.toHexString() }) });
+    const dbLedger = await getLedgerFromDb(userId);
+    ledger.updateMemLedger({ ledger: dbLedger });
+
+    const dbWallet = await getWallet(userId);
 
     wallet.updateMemCredentials({ wallet: dbWallet });
 
     // Set the userId for the user
-    wsServer.setUserId(user._id.toHexString());
+    // wsServer.setUserId(userId);
 
-    // Set the memPool for the user
-    wsServer.setMemPool(memPool);
+    // // Set the memPool for the user
+    // wsServer.setMemPool(memPool);
 
     // Start listening to nodes
     wsServer.listen();
+
+    //console.log('LOGGED IN USERS LEDGER', ledger)
 
 });
 

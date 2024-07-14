@@ -17,12 +17,17 @@ import { errorHandler } from './middleware/error-handler.mjs';
 import WSServer from './ws-server.mjs';
 import Wallet from './models/Wallet.mjs';
 import MemPool from './models/MemPool.mjs';
+import Ledger from './models/Ledger.mjs';
 
 dotenv.config({ path: './config/.env' });
 
 export const wallet = new Wallet();
+export const ledger = new Ledger();
 export const memPool = new MemPool();
-export const wsServer = new WSServer();
+export const wsServer = new WSServer({
+    ledger,
+    memPool
+});
 
 // Connect to MongoDB
 dbConnect();
@@ -34,6 +39,11 @@ const PORT = process.env.PORT || 4001;
 if (process.env.MODE === 'development') {
     app.use(logger);
 }
+
+// Broadcast the ledger every second
+setTimeout(() => {
+    wsServer.broadcast();
+}, 1000);
 
 // Body parser
 app.use(express.json());
