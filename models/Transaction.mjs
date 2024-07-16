@@ -1,11 +1,12 @@
 import { v4 as uuidv4 } from 'uuid';
 import { verifySignature } from '../utilities/crypto-lib.mjs';
+import { MINING_REWARD, REWARD_ADDRESS } from '../config/settings.mjs';
 
 export default class Transaction {
     constructor({ sender, recipient, amount, inputMap, outputMap }) {
         this.id = uuidv4().replaceAll('-', '');
-        this.outputMap = inputMap || this.generateOutputMap({ sender, recipient, amount });
-        this.inputMap = outputMap || this.generateInputMap({ sender, outputMap: this.outputMap });
+        this.outputMap = outputMap || this.generateOutputMap({ sender, recipient, amount });
+        this.inputMap = inputMap || this.generateInputMap({ sender, outputMap: this.outputMap });
     }
 
     generateOutputMap({ sender, recipient, amount }) {
@@ -19,14 +20,12 @@ export default class Transaction {
     }
 
     generateInputMap({ sender, outputMap }) {
-
         return {
             timestamp: Date.now(),
             amount: sender.balance,
             address: sender.publicKey,
-            signature: sender.sign(outputMap)
-        }
-
+            signature: sender.sign(outputMap),
+        };
     }
 
     update({ sender, recipient, amount }) {
@@ -66,4 +65,13 @@ export default class Transaction {
 
         return true;
     }
+
+
+    static transactionReward({ miner }) {
+        return new this({
+            inputMap: REWARD_ADDRESS,
+            outputMap: { [miner.publicKey]: MINING_REWARD },
+        });
+    }
+
 }

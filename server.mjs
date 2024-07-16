@@ -24,10 +24,7 @@ dotenv.config({ path: './config/.env' });
 export const wallet = new Wallet();
 export const ledger = new Ledger();
 export const memPool = new MemPool();
-export const wsServer = new WSServer({
-    ledger,
-    memPool
-});
+export const wsServer = new WSServer();
 
 // Connect to MongoDB
 dbConnect();
@@ -40,10 +37,12 @@ if (process.env.MODE === 'development') {
     app.use(logger);
 }
 
+wsServer.listen();
+
 // Broadcast the ledger every second
-setTimeout(() => {
-    wsServer.broadcast();
-}, 1000);
+// setTimeout(() => {
+//     wsServer.broadcast();
+// }, 1000);
 
 // Body parser
 app.use(express.json());

@@ -73,6 +73,9 @@ export const login = asyncHandler(async (req, res, next) => {
 
     // Set the userId for the user in the ledger
     ledger.setUserId({ userId });
+    console.log('The user id', userId);
+    console.log('The ledger when looggin in', ledger);
+    console.log('thel ledger id', ledger.userId);
 
     // todo: get the ledger and update mem ledger
     // ledger.updateMemLedger({ ledger: await Ledger.get({ userId: user._id.toHexString() }) });
@@ -90,7 +93,8 @@ export const login = asyncHandler(async (req, res, next) => {
     // wsServer.setMemPool(memPool);
 
     // Start listening to nodes
-    wsServer.listen();
+    // wsServer.listen();
+    wsServer.connectToNodes();
 
     //console.log('LOGGED IN USERS LEDGER', ledger)
 

@@ -6,34 +6,26 @@ import { memPool } from "./server.mjs";
 const SOCKET_PORT = process.env.SOCKET_PORT || 5001;
 const NODES = process.env.MEMBER_NODES ? process.env.MEMBER_NODES.split(',') : [];
 
+const CHANNELS = {
+    'LEDGER': 'ledger',
+    'TRANSACTION': 'transaction',
+    'MEMPOOL': 'memPool'
+}
+
 export default class WSServer {
 
-    constructor(/*{ userId, ledger, memPool } = {}*/) {
-        // this.ledger = ledger;
-        // this.memPool = memPool;
-        // this.userId = userId;
+    constructor() {
         this.nodes = [];
     };
 
-    // setUserId(userId) {
-    //     this.userId = userId;
-    // }
-
-    // setMemPool(memPool) {
-    //     this.memPool = memPool;
-    // }
-
-    // setLedger(ledger) {
-    //     this.ledger = ledger;
-    // }
 
     listen() {
-        console.log('THE USER ID', this.userId);
+
         const server = new WebSocketServer({ port: SOCKET_PORT });
 
         server.on('connection', (node) => this.connectNode(node));
 
-        this.connectToNodes();
+        // this.connectToNodes();
 
         console.log(`Listening to connections on port ${SOCKET_PORT}`);
     }
@@ -60,11 +52,9 @@ export default class WSServer {
 
         this.messageHandler(node);
 
-        // const ledger = await Ledger.get({ userId: this.userId });
+        node.send(JSON.stringify({ channel: CHANNELS.LEDGER, data: ledger.blocks }));
+        node.send(JSON.stringify({ channel: CHANNELS.MEMPOOL, data: memPool.transactionMap }));
 
-        // node.send(JSON.stringify(ledger));
-        console.log('Sending ledger to node...', ledger);
-        node.send(JSON.stringify({ type: 'ledger', data: ledger.blocks }))
     }
 
     messageHandler(node) {
@@ -73,14 +63,22 @@ export default class WSServer {
 
             const response = JSON.parse(message);
 
-            switch (response.type) {
-                case 'ledger':
+            switch (response.channel) {
+                case CHANNELS.LEDGER:
+                    console.log('reveived ledger');
                     ledger.replace({
                         newLedger: response.data
                     });
+                    memPool.clearBlockTransactions({ chain: response.data });
                     break;
-                case 'transaction':
+                case CHANNELS.MEMPOOL:
+                    console.log('Received mempool', response.data);
+                    memPool.replaceTransactionMap({ transactionMap: response.data });
+                    break;
+                case CHANNELS.TRANSACTION:
+                    console.log('Received transaction', response.data);
                     memPool.addTransaction({ transaction: response.data });
+                    console.log('The mempool', memPool);
                     break;
                 default:
                     return;
@@ -92,10 +90,11 @@ export default class WSServer {
 
     async broadcast() {
         console.log('Broadcasting ledger to all nodes...');
-        this.nodes.forEach((node) => node.send(JSON.stringify({ type: 'ledger', data: ledger.blocks })));
+        this.nodes.forEach((node) => node.send(JSON.stringify({ channel: CHANNELS.LEDGER, data: ledger.blocks })));
     }
 
     async broadcastTransaction({ transaction }) {
-        this.nodes.forEach((node) => node.send(JSON.stringify({ type: 'transaction', data: transaction })));
+        console.log('Broadcasting transaction to all nodes...');
+        this.nodes.forEach((node) => node.send(JSON.stringify({ channel: CHANNELS.TRANSACTION, data: transaction })));
     }
 }

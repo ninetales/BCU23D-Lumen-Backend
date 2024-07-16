@@ -20,6 +20,8 @@ export default class Ledger {
     }
 
     async addBlock({ transactions }) {
+        console.log('Adding a block to the ledger');
+        console.log('The provided transactions', transactions);
         const lastBlock = this.blocks.at(-1);
         const newBlock = Block.mineBlock({ lastBlock, transactions });
         this.blocks.push(newBlock);
@@ -48,15 +50,6 @@ export default class Ledger {
         console.log('The new updated ledger', updatedLedger);
     }
 
-    // /**
-    //  * @desc Get the ledger of the authenticated user
-    //  * @returns 
-    //  */
-    // // just get the local ledger
-    // static get({ userId }) {
-    //     return await getLedgerFromDb(userId);
-    // }
-
     /**
      * @desc Validate the ledger
      * @param {*} ledger 
@@ -84,7 +77,11 @@ export default class Ledger {
                 nonce,
                 difficulty
             );
-            if (hash !== validHash) return false;
+            if (hash !== validHash) {
+                console.log('The hash', hash, 'the valid hash', validHash);
+                console.log('The hash is invalid');
+                return false;
+            }
             console.log('The hash is valid');
         }
 

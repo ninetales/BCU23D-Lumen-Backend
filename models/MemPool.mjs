@@ -1,3 +1,5 @@
+import Transaction from "./Transaction.mjs";
+
 export default class MemPool {
     constructor() {
         this.transactionMap = {};
@@ -23,7 +25,7 @@ export default class MemPool {
             const block = chain[i];
 
             // Loop through the transactions in the block...
-            for (let transaction of block.data) {
+            for (let transaction of block.transactions) {
 
                 // Check if the transaction exists in the transactionMap...
                 if (this.transactionMap[transaction.id]) {
@@ -39,7 +41,19 @@ export default class MemPool {
         this.transactionMap = {};
     }
 
-    replaceTransactionMap(transactionMap) {
+    replaceTransactionMap({ transactionMap }) {
+        const localMemPoolSize = Object.keys(this.transactionMap).length;
+        const foreignMemPoolSize = Object.keys(transactionMap).length;
+        console.log('This.transactionmap length', localMemPoolSize);
+        console.log('Foreign transactionmap length', foreignMemPoolSize);
+        if (localMemPoolSize >= foreignMemPoolSize) return;
         this.transactionMap = transactionMap;
+    }
+
+    validateTransactions() {
+        const validTransactions = Object.values(this.transactionMap).filter(
+            (transaction) => Transaction.validate({ transaction })
+        );
+        return validTransactions;
     }
 }
