@@ -97,4 +97,5 @@ export default class WSServer {
         console.log('Broadcasting transaction to all nodes...');
         this.nodes.forEach((node) => node.send(JSON.stringify({ channel: CHANNELS.TRANSACTION, data: transaction })));
     }
+
 }

@@ -17,6 +17,7 @@ export default class Miner {
     async mineBlock() {
         console.log('Mine block...', ledger);
         console.log('memPool...', memPool);
+        console.log('Wallet...', wallet);
         // todo: validate transactions from the transaction pool (mempool)
         const validTransactions = memPool.validateTransactions();
         // const validTransactions = {
@@ -29,9 +30,10 @@ export default class Miner {
         console.log('The miners wallet', wallet);
 
         // todo: create a reward transaction
-        // validTransactions.push(
-        //     Transaction.transactionReward({ minerAddress: wallet.publicKey });
-        // );
+        validTransactions.push(
+            Transaction.transactionReward({ miner: wallet })
+        );
+
         // console.log('Mine Block -2: created a reward transaction completed', validTransactions);
 
         // todo: create a block with the valid transactions and place it in the ledger
@@ -49,5 +51,10 @@ export default class Miner {
 
         // clear the transaction pool
         memPool.clearTransactions();
+
+        // const reward = Transaction.transactionReward({ miner: wallet });
+        // memPool.addTransaction({ transaction: reward });
+        // console.log('Reward', reward);
+        // wsServer.broadcastTransaction({ transaction: reward });
     }
 }
