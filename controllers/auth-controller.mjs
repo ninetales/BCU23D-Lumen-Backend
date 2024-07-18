@@ -77,6 +77,8 @@ export const login = asyncHandler(async (req, res, next) => {
     console.log('The ledger when looggin in', ledger);
     console.log('thel ledger id', ledger.userId);
 
+    wallet.setUserId({ userId });
+
     // todo: get the ledger and update mem ledger
     // ledger.updateMemLedger({ ledger: await Ledger.get({ userId: user._id.toHexString() }) });
     const dbLedger = await getLedgerFromDb(userId);

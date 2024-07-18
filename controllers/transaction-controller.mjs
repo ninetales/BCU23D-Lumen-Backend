@@ -2,6 +2,7 @@ import { asyncHandler } from "../middleware/async-handler.mjs";
 import ResponseModel from "../models/ResponseModel.mjs";
 import { wallet, wsServer } from "../server.mjs";
 import { memPool } from "../server.mjs";
+import { ledger } from "../server.mjs";
 
 export const addTransaction = asyncHandler(async (req, res, next) => {
     const { recipient, amount } = req.body;
@@ -11,12 +12,15 @@ export const addTransaction = asyncHandler(async (req, res, next) => {
     if (transaction) {
         transaction.update({ sender: wallet, recipient, amount: parseFloat(amount) });
     } else {
-        transaction = wallet.createTransaction({ recipient, amount: parseFloat(amount) });
+        transaction = wallet.createTransaction({
+            recipient,
+            amount: parseFloat(amount),
+            chain: ledger.blocks
+        });
     }
 
     memPool.addTransaction({ transaction });
 
-    // todo: broadcast to all nodes
     wsServer.broadcastTransaction({ transaction });
 
     res.status(200).json(new ResponseModel(200, transaction));

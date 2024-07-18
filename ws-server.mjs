@@ -1,7 +1,8 @@
 import { WebSocketServer, WebSocket } from "ws";
-import Ledger from "./models/Ledger.mjs";
-import { ledger } from "./server.mjs";
+import { ledger, wallet } from "./server.mjs";
 import { memPool } from "./server.mjs";
+import Wallet from "./models/Wallet.mjs";
+import { updateDbBalance } from "./services/wallet-services.mjs";
 
 const SOCKET_PORT = process.env.SOCKET_PORT || 5001;
 const NODES = process.env.MEMBER_NODES ? process.env.MEMBER_NODES.split(',') : [];
@@ -24,8 +25,6 @@ export default class WSServer {
         const server = new WebSocketServer({ port: SOCKET_PORT });
 
         server.on('connection', (node) => this.connectNode(node));
-
-        // this.connectToNodes();
 
         console.log(`Listening to connections on port ${SOCKET_PORT}`);
     }
@@ -58,27 +57,30 @@ export default class WSServer {
     }
 
     messageHandler(node) {
-        node.on('message', (message) => {
+        node.on('message', async (message) => {
             console.log('Response received:', JSON.parse(message));
 
             const response = JSON.parse(message);
 
             switch (response.channel) {
                 case CHANNELS.LEDGER:
-                    console.log('reveived ledger');
+                    console.log('Received ledger');
                     ledger.replace({
                         newLedger: response.data
                     });
                     memPool.clearBlockTransactions({ chain: response.data });
+                    const newBalance = Wallet.calculateBalance({ chain: ledger.blocks, address: wallet.publicKey });
+                    console.log('newbalance', newBalance);
+                    wallet.balance = newBalance;
+                    await updateDbBalance({ userId: wallet.userId, balance: newBalance });
                     break;
                 case CHANNELS.MEMPOOL:
-                    console.log('Received mempool', response.data);
+                    console.log('Received mempool');
                     memPool.replaceTransactionMap({ transactionMap: response.data });
                     break;
                 case CHANNELS.TRANSACTION:
-                    console.log('Received transaction', response.data);
+                    console.log('Received transaction');
                     memPool.addTransaction({ transaction: response.data });
-                    console.log('The mempool', memPool);
                     break;
                 default:
                     return;
