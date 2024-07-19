@@ -26,6 +26,7 @@ export default class Miner {
         // clear the transaction pool
         memPool.clearTransactions();
 
+        // Update the miners db balance and local wallet balance
         const newBalance = Wallet.calculateBalance({ chain: ledger.blocks, address: wallet.publicKey });
         console.log('newbalance', newBalance);
         wallet.balance = newBalance;

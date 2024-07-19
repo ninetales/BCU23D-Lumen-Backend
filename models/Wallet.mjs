@@ -13,9 +13,9 @@ export default class Wallet {
         this.balance = INITIAL_BALANCE;
     };
 
-    setUserId({ userId }) {
-        this.userId = userId;
-    }
+    // setUserId({ userId }) {
+    //     this.userId = userId;
+    // }
 
     // Intsance methods...
     sign(transaction) {
@@ -37,6 +37,7 @@ export default class Wallet {
     }
 
     updateMemCredentials({ wallet }) {
+        this.userId = wallet.user.toHexString();
         this.privateKey = wallet.privateKey;
         this.publicKey = wallet.publicKey;
         this.balance = parseFloat(wallet.balance);

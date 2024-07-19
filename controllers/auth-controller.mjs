@@ -73,14 +73,7 @@ export const login = asyncHandler(async (req, res, next) => {
 
     // Set the userId for the user in the ledger
     ledger.setUserId({ userId });
-    console.log('The user id', userId);
-    console.log('The ledger when looggin in', ledger);
-    console.log('thel ledger id', ledger.userId);
 
-    wallet.setUserId({ userId });
-
-    // todo: get the ledger and update mem ledger
-    // ledger.updateMemLedger({ ledger: await Ledger.get({ userId: user._id.toHexString() }) });
     const dbLedger = await getLedgerFromDb(userId);
     ledger.updateMemLedger({ ledger: dbLedger });
 
@@ -88,17 +81,8 @@ export const login = asyncHandler(async (req, res, next) => {
 
     wallet.updateMemCredentials({ wallet: dbWallet });
 
-    // Set the userId for the user
-    // wsServer.setUserId(userId);
-
-    // // Set the memPool for the user
-    // wsServer.setMemPool(memPool);
-
-    // Start listening to nodes
-    // wsServer.listen();
+    // Connect to the nodes
     wsServer.connectToNodes();
-
-    //console.log('LOGGED IN USERS LEDGER', ledger)
 
 });
 
