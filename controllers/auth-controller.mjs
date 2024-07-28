@@ -104,5 +104,5 @@ export const getUser = asyncHandler(async (req, res, next) => {
  */
 const sendAuthToken = (user, statusCode, res) => {
     const token = user.generateAuthToken();
-    res.status(200).json({ sucess: true, statusCode, token });
+    res.status(200).json({ success: true, statusCode, token });
 };

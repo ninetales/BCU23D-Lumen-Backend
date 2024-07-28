@@ -58,14 +58,14 @@ app.use(xss());
 
 // Limit requests from the API (DDOS protection)
 const limit = rateLimit({
-    windowMs: 5 * 60 * 1000, // 5 minutes window
-    limit: 100,
+    windowMs: 50 * 60 * 1000, // 50 minutes window
+    limit: 1000,
 });
 
 app.use(limit);
 
 // Activate CORS()
-app.use(cors());
+app.use(cors({ origin: '*' }));
 
 // Prevent HPP attacks (http parameter pollution)
 app.use(hpp());
