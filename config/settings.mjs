@@ -1,5 +1,5 @@
 export const INITIAL_BALANCE = 500;
-export const MINE_RATE = 500000;
+export const MINE_RATE = 1000000;
 export const MINING_REWARD = 20;
 export const REWARD_ADDRESS = { address: 'reward-address' };
 const INITIAL_DIFFICULTY = 4;
